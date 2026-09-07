@@ -58,7 +58,10 @@ export class AuthController {
   @Get('google/status')
   @ApiOperation({ summary: 'Google 로그인 설정 여부' })
   googleStatus() {
-    return { enabled: this.googleOAuth.isConfigured() };
+    return {
+      enabled: this.googleOAuth.isConfigured(),
+      redirectUri: this.googleOAuth.getCallbackUrl(),
+    };
   }
 
   @Public()
@@ -67,8 +70,8 @@ export class AuthController {
   @Get('google')
   @Redirect()
   @ApiOperation({ summary: 'Google 로그인/가입 시작' })
-  googleStart(@Req() req: Request) {
-    return { url: this.googleOAuth.buildAuthUrl(req), statusCode: 302 };
+  googleStart() {
+    return { url: this.googleOAuth.buildAuthUrl(), statusCode: 302 };
   }
 
   @Public()
@@ -78,18 +81,14 @@ export class AuthController {
     @Query('code') code: string | undefined,
     @Query('state') state: string | undefined,
     @Query('error') error: string | undefined,
-    @Req() req: Request,
     @Res() res: Response,
   ) {
     try {
-      const ticket = await this.googleOAuth.handleCallback(
-        {
-          code,
-          state,
-          error,
-        },
-        req,
-      );
+      const ticket = await this.googleOAuth.handleCallback({
+        code,
+        state,
+        error,
+      });
       res.redirect(
         `/api/auth/google/complete?ticket=${encodeURIComponent(ticket)}`,
       );

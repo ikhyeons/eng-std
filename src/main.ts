@@ -10,6 +10,7 @@ import type { Express, Request, Response } from 'express';
 import type { IncomingMessage, ServerResponse } from 'http';
 import { AppModule } from './app.module';
 import { renderIndexPage } from './index.page';
+import { renderSwaggerPage } from './docs.page';
 
 async function createNestApp(): Promise<NestExpressApplication> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -45,9 +46,14 @@ async function createNestApp(): Promise<NestExpressApplication> {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, { ui: false });
 
   const http = app.getHttpAdapter().getInstance();
+  const sendDocs = (_req: Request, res: Response) => {
+    res.type('html').send(renderSwaggerPage());
+  };
+  http.get('/docs', sendDocs);
+  http.get('/docs/', sendDocs);
   http.get('/', (_req: Request, res: Response) => {
     res.type('html').send(renderIndexPage());
   });
