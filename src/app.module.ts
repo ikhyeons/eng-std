@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import * as mysql2 from 'mysql2';
+import { mysqlConnectionOptions } from './database/mysql.options';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -32,29 +32,21 @@ import {
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => {
-        const mysql = {
-          type: 'mysql' as const,
-          driver: mysql2,
-          host: config.get('DB_HOST', 'localhost'),
-          port: config.get<number>('DB_PORT', 3306),
-          username: config.get('DB_USER', 'root'),
-          password: config.get('DB_PASSWORD', ''),
-          database: config.get('DB_NAME', 'eng_std'),
-          charset: 'utf8mb4' as const,
-          timezone: '+09:00',
-        };
+        const mysql = mysqlConnectionOptions(config);
 
-        const bootstrap = new DataSource({
-          ...mysql,
-          entities: [],
-          synchronize: false,
-        });
-        await bootstrap.initialize();
-        try {
-          await migrateLegacySituationJson(bootstrap);
-          await ensureSituationMasterDetail(bootstrap);
-        } finally {
-          await bootstrap.destroy();
+        if (!process.env.VERCEL) {
+          const bootstrap = new DataSource({
+            ...mysql,
+            entities: [],
+            synchronize: false,
+          });
+          await bootstrap.initialize();
+          try {
+            await migrateLegacySituationJson(bootstrap);
+            await ensureSituationMasterDetail(bootstrap);
+          } finally {
+            await bootstrap.destroy();
+          }
         }
 
         return {

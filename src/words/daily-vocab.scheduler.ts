@@ -9,6 +9,7 @@ export class DailyVocabScheduler implements OnModuleInit {
   constructor(private readonly wordsService: WordsService) {}
 
   async onModuleInit() {
+    if (process.env.VERCEL) return;
     await this.run('서버 시작 시 오늘 데이터 확인', () =>
       this.wordsService.generateToday(),
     );
