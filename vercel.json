@@ -11,7 +11,10 @@
       ]
     }
   ],
-  "outputFileTracingIncludes": {
-    "src/**": ["./public/downloads/**"]
-  }
+  "redirects": [
+    {
+      "source": "/download",
+      "destination": "/downloads/PJ-Electron-Setup-1.0.0.exe.zip"
+    }
+  ]
 }

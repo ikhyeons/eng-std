@@ -60,11 +60,11 @@ async function createNestApp(): Promise<NestExpressApplication> {
   http.get('/docs/', sendDocs);
   http.get('/download', (_req: Request, res: Response) => {
     const file = installerFilePath();
-    if (!file) {
-      res.status(404).send('설치 파일을 찾을 수 없습니다.');
+    if (file) {
+      res.download(file, INSTALLER_DOWNLOAD_NAME);
       return;
     }
-    res.download(file, INSTALLER_DOWNLOAD_NAME);
+    res.redirect(`/downloads/${INSTALLER_DOWNLOAD_NAME}`);
   });
   http.get('/', (_req: Request, res: Response) => {
     res.type('html').send(renderIndexPage());
