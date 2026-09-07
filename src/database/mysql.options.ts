@@ -1,13 +1,13 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as mysql2 from 'mysql2';
-import type { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
+import type { DataSourceOptions } from 'typeorm';
 
 const logger = new Logger('MySQL');
 
 export function mysqlConnectionOptions(
   config: ConfigService,
-): MysqlConnectionOptions {
+): DataSourceOptions {
   const host = config.get<string>('DB_HOST', 'localhost');
   const port = Number(config.get('DB_PORT', 3306));
   const database = config.get<string>('DB_NAME', 'eng_std');
