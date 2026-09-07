@@ -1,0 +1,43 @@
+# compiled output
+/dist
+/build
+
+# dependencies
+/node_modules
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# tests
+/coverage
+/.nyc_output
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+*.swp
+*.swo
+
+# temp
+*.tmp
+*.temp
+.cache
