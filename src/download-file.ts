@@ -1,12 +1,22 @@
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
+function resolvedVersionFile(): string | null {
+  try {
+    // 상대 경로를 고정해 두면 Vercel 번들에 products/version.txt 가 포함됩니다.
+    return require.resolve('../products/version.txt');
+  } catch {
+    return null;
+  }
+}
+
 function versionFilePath(): string | null {
   const candidates = [
+    resolvedVersionFile(),
     join(process.cwd(), 'products', 'version.txt'),
     join(__dirname, '..', 'products', 'version.txt'),
     join(__dirname, '..', '..', 'products', 'version.txt'),
-  ];
+  ].filter((file): file is string => Boolean(file));
   return candidates.find((file) => existsSync(file)) ?? null;
 }
 
