@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { GoogleProfile } from './types/auth.types';
 
@@ -39,7 +40,7 @@ export class GoogleOAuthService {
     return Boolean(this.clientId && this.clientSecret);
   }
 
-  buildAuthUrl(): string {
+  buildAuthUrl(req?: Request): string {
     this.assertConfigured();
     const state = this.jwt.sign(
       { typ: 'google_oauth' } satisfies GoogleStatePayload,
@@ -51,7 +52,7 @@ export class GoogleOAuthService {
 
     const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     url.searchParams.set('client_id', this.clientId);
-    url.searchParams.set('redirect_uri', this.callbackUrl);
+    url.searchParams.set('redirect_uri', this.callbackUrl(req));
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('scope', 'openid email profile');
     url.searchParams.set('state', state);
@@ -61,11 +62,14 @@ export class GoogleOAuthService {
     return url.toString();
   }
 
-  async handleCallback(params: {
-    code?: string;
-    state?: string;
-    error?: string;
-  }): Promise<string> {
+  async handleCallback(
+    params: {
+      code?: string;
+      state?: string;
+      error?: string;
+    },
+    req?: Request,
+  ): Promise<string> {
     if (params.error === 'access_denied') {
       throw new UnauthorizedException('Google 로그인을 취소했습니다.');
     }
@@ -77,11 +81,11 @@ export class GoogleOAuthService {
     }
 
     await this.verifyState(params.state);
-    const profile = await this.exchangeCode(params.code);
+    const profile = await this.exchangeCode(params.code, req);
     return this.authService.createGoogleLoginTicket(profile);
   }
 
-  private async exchangeCode(code: string): Promise<GoogleProfile> {
+  private async exchangeCode(code: string, req?: Request): Promise<GoogleProfile> {
     this.assertConfigured();
 
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
@@ -91,7 +95,7 @@ export class GoogleOAuthService {
         code,
         client_id: this.clientId,
         client_secret: this.clientSecret,
-        redirect_uri: this.callbackUrl,
+        redirect_uri: this.callbackUrl(req),
         grant_type: 'authorization_code',
       }),
     });
@@ -162,12 +166,26 @@ export class GoogleOAuthService {
     return this.config.get<string>('GOOGLE_CLIENT_SECRET', '').trim();
   }
 
-  private get callbackUrl(): string {
+  private callbackUrl(req?: Request): string {
+    const fromRequest = this.callbackFromRequest(req);
+    if (fromRequest) return fromRequest;
+    const fromEnv = this.config.get<string>('GOOGLE_CALLBACK_URL')?.trim();
+    if (fromEnv) return fromEnv;
     const port = this.config.get<string>('PORT', '3000');
-    return (
-      this.config.get<string>('GOOGLE_CALLBACK_URL')?.trim() ||
-      `http://localhost:${port}/api/auth/google/callback`
-    );
+    return `http://localhost:${port}/api/auth/google/callback`;
+  }
+
+  private callbackFromRequest(req?: Request): string | null {
+    if (!req) return null;
+    const hostHeader =
+      (req.headers['x-forwarded-host'] as string | undefined)?.split(',')[0]?.trim() ||
+      req.get('host');
+    if (!hostHeader || hostHeader.startsWith('localhost')) return null;
+    const proto =
+      (req.headers['x-forwarded-proto'] as string | undefined)?.split(',')[0]?.trim() ||
+      req.protocol ||
+      'https';
+    return `${proto}://${hostHeader}/api/auth/google/callback`;
   }
 
   private get stateSecret(): string {
