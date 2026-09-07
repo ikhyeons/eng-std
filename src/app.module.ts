@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import * as mysql2 from 'mysql2';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -33,6 +34,7 @@ import {
       useFactory: async (config: ConfigService) => {
         const mysql = {
           type: 'mysql' as const,
+          driver: mysql2,
           host: config.get('DB_HOST', 'localhost'),
           port: config.get<number>('DB_PORT', 3306),
           username: config.get('DB_USER', 'root'),
