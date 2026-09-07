@@ -35,23 +35,21 @@ export function appVersion(): string {
   return line;
 }
 
-export function installerDownloadName(version = appVersion()): string {
-  return `eng-std-Setup-${version}.exe.zip`;
+export function installerFileName(version = appVersion()): string {
+  return `eng-std ${version}.zip`;
 }
 
-export function installerSourceName(version = appVersion()): string {
-  return `eng-std Setup ${version}.exe.zip`;
+export function installerDownloadPath(version = appVersion()): string {
+  return `/downloads/${encodeURIComponent(installerFileName(version))}`;
 }
 
 export function installerFilePath(): string | null {
-  const version = appVersion();
-  const downloadName = installerDownloadName(version);
-  const sourceName = installerSourceName(version);
+  const fileName = installerFileName();
   const candidates = [
-    join(process.cwd(), 'public', 'downloads', downloadName),
-    join(process.cwd(), 'products', sourceName),
-    join(__dirname, '..', 'public', 'downloads', downloadName),
-    join(__dirname, '..', '..', 'public', 'downloads', downloadName),
+    join(process.cwd(), 'public', 'downloads', fileName),
+    join(process.cwd(), 'products', fileName),
+    join(__dirname, '..', 'public', 'downloads', fileName),
+    join(__dirname, '..', '..', 'public', 'downloads', fileName),
   ];
   return candidates.find((file) => existsSync(file)) ?? null;
 }

@@ -1,3 +1,5 @@
+import { installerDownloadPath } from './download-file';
+
 export function renderIndexPage(version: string): string {
   return `<!DOCTYPE html>
 <html lang="ko">
@@ -167,7 +169,7 @@ export function renderIndexPage(version: string): string {
       <div class="tile"><strong>프로필</strong><span>일정 · 메모 · 활동</span></div>
     </div>
     <div class="actions">
-      <a class="download" href="/download">Windows 앱 다운로드<small>v${version}</small></a>
+      <a class="download" href="${installerDownloadPath(version)}">Windows 앱 다운로드<small>v${version}</small></a>
       <a class="ghost" href="/docs">API 문서</a>
       <a class="ghost" href="/api/health">서버 상태</a>
     </div>
