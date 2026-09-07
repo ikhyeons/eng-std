@@ -42,7 +42,7 @@ async function createNestApp(): Promise<NestExpressApplication> {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Eng Study API')
+    .setTitle('eng-std API')
     .setDescription('영어 학습 앱 백엔드 API')
     .setVersion('1.0')
     .addBearerAuth()

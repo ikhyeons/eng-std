@@ -3,7 +3,7 @@ export function renderSwaggerPage(): string {
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>Eng Study API</title>
+  <title>eng-std API</title>
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.32.13/swagger-ui.css" />
   <style>
     body { margin: 0; background: #fafafa; }

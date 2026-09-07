@@ -1,4 +1,4 @@
-# eng_std_serv
+# eng-std
 
 영어 학습 앱 백엔드 (NestJS + TypeORM + MySQL)
 

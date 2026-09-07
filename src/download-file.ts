@@ -36,11 +36,11 @@ export function appVersion(): string {
 }
 
 export function installerDownloadName(version = appVersion()): string {
-  return `PJ-Electron-Setup-${version}.exe.zip`;
+  return `eng-std-Setup-${version}.exe.zip`;
 }
 
 export function installerSourceName(version = appVersion()): string {
-  return `PJ-Electron Setup ${version}.exe.zip`;
+  return `eng-std Setup ${version}.exe.zip`;
 }
 
 export function installerFilePath(): string | null {

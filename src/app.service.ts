@@ -9,6 +9,6 @@ export class AppService {
   }
 
   getHealth() {
-    return { ok: true, service: "Today's Study" };
+    return { ok: true, service: 'eng-std' };
   }
 }

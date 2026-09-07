@@ -4,7 +4,7 @@ export function renderIndexPage(version: string): string {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Today's Study</title>
+  <title>eng-std</title>
   <style>
     :root {
       --bg: #f4f4f8;
@@ -154,7 +154,7 @@ export function renderIndexPage(version: string): string {
     <div class="brand">
       <div class="logo">📚</div>
       <div class="brand-text">
-        <h1>Today's Study</h1>
+        <h1>eng-std</h1>
         <span class="version">앱 v${version}</span>
       </div>
     </div>
