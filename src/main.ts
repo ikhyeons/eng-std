@@ -5,12 +5,14 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import type { Request, Response } from 'express';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import type { Express, Request, Response } from 'express';
+import type { IncomingMessage, ServerResponse } from 'http';
 import { AppModule } from './app.module';
 import { renderIndexPage } from './index.page';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+async function createNestApp(): Promise<NestExpressApplication> {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors({
     origin: true,
@@ -50,9 +52,37 @@ async function bootstrap() {
     res.type('html').send(renderIndexPage());
   });
 
+  await app.init();
+  return app;
+}
+
+let expressApp: Express | undefined;
+let ready: Promise<Express> | undefined;
+
+function getExpressApp(): Promise<Express> {
+  ready ??= createNestApp().then((app) => {
+    expressApp = app.getHttpAdapter().getInstance();
+    return expressApp;
+  });
+  return ready;
+}
+
+async function startLocal() {
+  const app = await createNestApp();
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
   console.log(`🚀 Server running on http://localhost:${port}/`);
   console.log(`📖 Swagger docs: http://localhost:${port}/docs`);
 }
-bootstrap();
+
+if (!process.env.VERCEL) {
+  void startLocal();
+}
+
+async function handler(req: IncomingMessage, res: ServerResponse) {
+  const server = await getExpressApp();
+  server(req, res);
+}
+
+export default handler;
+module.exports = handler;
