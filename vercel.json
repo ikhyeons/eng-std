@@ -1,20 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "src/main.ts": {
+      "includeFiles": "products/version.txt"
+    }
+  },
   "headers": [
     {
       "source": "/downloads/(.*)",
       "headers": [
         {
           "key": "Content-Disposition",
-          "value": "attachment; filename=\"PJ-Electron-Setup-1.0.0.exe.zip\""
+          "value": "attachment"
         }
       ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/download",
-      "destination": "/downloads/PJ-Electron-Setup-1.0.0.exe.zip"
     }
   ]
 }

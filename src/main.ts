@@ -12,7 +12,7 @@ import type { IncomingMessage, ServerResponse } from 'http';
 import { AppModule } from './app.module';
 import { renderIndexPage } from './index.page';
 import { renderSwaggerPage } from './docs.page';
-import { INSTALLER_DOWNLOAD_NAME, installerFilePath } from './download-file';
+import { appVersion, installerDownloadName, installerFilePath } from './download-file';
 
 async function createNestApp(): Promise<NestExpressApplication> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -59,15 +59,16 @@ async function createNestApp(): Promise<NestExpressApplication> {
   http.get('/docs', sendDocs);
   http.get('/docs/', sendDocs);
   http.get('/download', (_req: Request, res: Response) => {
+    const fileName = installerDownloadName();
     const file = installerFilePath();
     if (file) {
-      res.download(file, INSTALLER_DOWNLOAD_NAME);
+      res.download(file, fileName);
       return;
     }
-    res.redirect(`/downloads/${INSTALLER_DOWNLOAD_NAME}`);
+    res.redirect(`/downloads/${fileName}`);
   });
   http.get('/', (_req: Request, res: Response) => {
-    res.type('html').send(renderIndexPage());
+    res.type('html').send(renderIndexPage(appVersion()));
   });
 
   await app.init();

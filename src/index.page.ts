@@ -1,4 +1,4 @@
-export function renderIndexPage(): string {
+export function renderIndexPage(version: string): string {
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -51,6 +51,19 @@ export function renderIndexPage(): string {
       font-size: 22px;
     }
     h1 { font-size: 1.6rem; letter-spacing: -0.03em; }
+    .brand-text { display: flex; flex-direction: column; gap: 6px; }
+    .version {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #eeedff;
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
     .status {
       display: inline-flex;
       align-items: center;
@@ -120,8 +133,16 @@ export function renderIndexPage(): string {
       background: var(--accent);
       color: #fff;
       min-width: 160px;
+      flex-direction: column;
+      gap: 2px;
+      padding: 10px 18px;
     }
     .download:hover { background: var(--accent-hover); }
+    .download small {
+      font-size: 0.72rem;
+      font-weight: 600;
+      opacity: 0.85;
+    }
     @media (max-width: 520px) {
       .grid { grid-template-columns: 1fr; }
       .card { padding: 28px 20px; }
@@ -132,7 +153,10 @@ export function renderIndexPage(): string {
   <main class="card">
     <div class="brand">
       <div class="logo">📚</div>
-      <h1>Today's Study</h1>
+      <div class="brand-text">
+        <h1>Today's Study</h1>
+        <span class="version">앱 v${version}</span>
+      </div>
     </div>
     <div class="status"><i></i>API 서버가 실행 중입니다</div>
     <p>영어 학습 앱 백엔드입니다. Windows 설치 파일을 받은 뒤 로그인하면 오늘의 단어, 퀴즈, AI 회화를 이어서 사용할 수 있습니다.</p>
@@ -143,7 +167,7 @@ export function renderIndexPage(): string {
       <div class="tile"><strong>프로필</strong><span>일정 · 메모 · 활동</span></div>
     </div>
     <div class="actions">
-      <a class="download" href="/download">Windows 앱 다운로드</a>
+      <a class="download" href="/download">Windows 앱 다운로드<small>v${version}</small></a>
       <a class="ghost" href="/docs">API 문서</a>
       <a class="ghost" href="/api/health">서버 상태</a>
     </div>
