@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { renderIndexPage } from './index.page';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getIndexPage(): string {
+    return renderIndexPage();
+  }
+
+  getHealth() {
+    return { ok: true, service: "Today's Study" };
   }
 }
