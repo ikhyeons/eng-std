@@ -116,6 +116,12 @@ export function renderIndexPage(): string {
       color: var(--text);
       border: 1px solid var(--border);
     }
+    .download {
+      background: var(--accent);
+      color: #fff;
+      min-width: 160px;
+    }
+    .download:hover { background: var(--accent-hover); }
     @media (max-width: 520px) {
       .grid { grid-template-columns: 1fr; }
       .card { padding: 28px 20px; }
@@ -129,7 +135,7 @@ export function renderIndexPage(): string {
       <h1>Today's Study</h1>
     </div>
     <div class="status"><i></i>API 서버가 실행 중입니다</div>
-    <p>영어 학습 앱 백엔드입니다. 데스크톱 앱에서 로그인하면 오늘의 단어, 퀴즈, AI 회화를 이어서 사용할 수 있습니다.</p>
+    <p>영어 학습 앱 백엔드입니다. Windows 설치 파일을 받은 뒤 로그인하면 오늘의 단어, 퀴즈, AI 회화를 이어서 사용할 수 있습니다.</p>
     <div class="grid">
       <div class="tile"><strong>오늘의 단어</strong><span>상황별 어휘와 표현</span></div>
       <div class="tile"><strong>퀴즈</strong><span>학습 기록과 정답률</span></div>
@@ -137,7 +143,8 @@ export function renderIndexPage(): string {
       <div class="tile"><strong>프로필</strong><span>일정 · 메모 · 활동</span></div>
     </div>
     <div class="actions">
-      <a class="primary" href="/docs">API 문서</a>
+      <a class="download" href="/download">Windows 앱 다운로드</a>
+      <a class="ghost" href="/docs">API 문서</a>
       <a class="ghost" href="/api/health">서버 상태</a>
     </div>
   </main>

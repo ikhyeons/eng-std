@@ -7,10 +7,12 @@ import {
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { Express, Request, Response } from 'express';
+import { join } from 'path';
 import type { IncomingMessage, ServerResponse } from 'http';
 import { AppModule } from './app.module';
 import { renderIndexPage } from './index.page';
 import { renderSwaggerPage } from './docs.page';
+import { INSTALLER_DOWNLOAD_NAME, installerFilePath } from './download-file';
 
 async function createNestApp(): Promise<NestExpressApplication> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -48,12 +50,22 @@ async function createNestApp(): Promise<NestExpressApplication> {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document, { ui: false });
 
+  app.useStaticAssets(join(process.cwd(), 'public'));
+
   const http = app.getHttpAdapter().getInstance();
   const sendDocs = (_req: Request, res: Response) => {
     res.type('html').send(renderSwaggerPage());
   };
   http.get('/docs', sendDocs);
   http.get('/docs/', sendDocs);
+  http.get('/download', (_req: Request, res: Response) => {
+    const file = installerFilePath();
+    if (!file) {
+      res.status(404).send('설치 파일을 찾을 수 없습니다.');
+      return;
+    }
+    res.download(file, INSTALLER_DOWNLOAD_NAME);
+  });
   http.get('/', (_req: Request, res: Response) => {
     res.type('html').send(renderIndexPage());
   });
