@@ -27,19 +27,32 @@ export class WordsService {
     private readonly situationGenerator: SituationGeneratorService,
   ) {}
 
-  /** 앱은 저장된 오늘의 학습만 조회한다. AI를 호출하지 않는다. */
+  /** 앱은 저장된 오늘의 학습을 조회한다. 없으면 그때 생성한다. */
   async getToday(): Promise<Situation> {
     const date = this.todayKst();
     const pending = this.inflight.get(date);
     if (pending) return pending;
 
     const saved = await this.findWithItems(date);
-    if (!saved) {
+    if (saved) return this.toSituation(saved);
+
+    try {
+      const created = await this.generateForDate(date);
+      if (created) return created;
+    } catch (error) {
+      this.logger.error(
+        `[situation_generator] 오늘 생성 실패: ${error instanceof Error ? error.message : error}`,
+      );
+      const latest = await this.findLatest();
+      if (latest) return this.toSituation(latest);
       throw new NotFoundException(
-        '오늘 학습 내용이 아직 준비되지 않았습니다. 서버가 매일 23시 55분(KST)에 다음 날 학습을 생성합니다.',
+        '오늘 학습 내용이 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.',
       );
     }
-    return this.toSituation(saved);
+
+    throw new NotFoundException(
+      '오늘 학습 내용이 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.',
+    );
   }
 
   async getTodayWords(): Promise<SituationWord[]> {
@@ -94,7 +107,7 @@ export class WordsService {
   }
 
   private async runGenerator(date: string): Promise<Situation> {
-    const situationText = takeAndMoveLastSituationToTop();
+    const situationText = takeAndMoveLastSituationToTop(date);
     if (!situationText) {
       throw new Error('situation.txt의 마지막 줄이 비어 있습니다.');
     }
@@ -143,6 +156,13 @@ export class WordsService {
     return this.repo.findOne({
       where: { date },
       relations: { words: true, phrases: true },
+    });
+  }
+
+  private findLatest() {
+    return this.repo.findOne({
+      relations: { words: true, phrases: true },
+      order: { date: 'DESC' },
     });
   }
 

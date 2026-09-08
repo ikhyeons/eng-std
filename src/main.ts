@@ -98,10 +98,13 @@ if (!process.env.VERCEL) {
   void startLocal();
 }
 
+export const maxDuration = 300;
+
 async function handler(req: IncomingMessage, res: ServerResponse) {
   const server = await getExpressApp();
   server(req, res);
 }
 
-export default handler;
-module.exports = handler;
+const vercelHandler = Object.assign(handler, { maxDuration });
+export default vercelHandler;
+module.exports = vercelHandler;

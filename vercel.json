@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/words/prepare",
+      "schedule": "55 14 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/downloads/(.*)",

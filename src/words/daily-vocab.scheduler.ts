@@ -17,6 +17,7 @@ export class DailyVocabScheduler implements OnModuleInit {
 
   @Cron('55 23 * * *', { timeZone: 'Asia/Seoul' })
   async at2355Kst() {
+    if (process.env.VERCEL) return;
     await this.run('매일 23시 55분(KST), 다음 날 학습 생성', () =>
       this.wordsService.generateTomorrow(),
     );
