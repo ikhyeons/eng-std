@@ -63,6 +63,38 @@ export class WordsService {
     return (await this.getToday()).phrases;
   }
 
+  /**
+   * 오늘(KST) 학습이 있으면 그대로 반환하고, 없으면 생성해서 반환한다.
+   * 이전 날짜로 대체하지 않는다.
+   */
+  async ensureLatest(): Promise<{
+    date: string;
+    generated: boolean;
+    situation: Situation;
+  }> {
+    const date = this.todayKst();
+    const saved = await this.findWithItems(date);
+    if (saved) {
+      return {
+        date,
+        generated: false,
+        situation: this.toSituation(saved),
+      };
+    }
+
+    const created = await this.generateForDate(date);
+    if (!created) {
+      throw new NotFoundException(
+        '오늘 학습 내용을 준비하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+      );
+    }
+    return {
+      date,
+      generated: true,
+      situation: created,
+    };
+  }
+
   async getAll(): Promise<Situation[]> {
     const rows = await this.repo.find({
       relations: { words: true, phrases: true },

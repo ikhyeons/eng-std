@@ -29,6 +29,15 @@ export class WordsController {
     return this.wordsService.getTodayPhrases();
   }
 
+  @Public()
+  @Get('ensure-latest')
+  @ApiOperation({
+    summary: '오늘(KST) 학습이 없으면 생성한 뒤 반환 (로그인 불필요)',
+  })
+  ensureLatest() {
+    return this.wordsService.ensureLatest();
+  }
+
   @Get()
   @ApiOperation({ summary: '저장된 상황 목록 조회' })
   getAll() {
